@@ -31,6 +31,10 @@ export const throttle = (fn, time) => {
         }
     }
 }
+function test(){
+    console.log(this)
+}
+throttle(test,0)()
 /**
  *深拷贝
  */
@@ -98,9 +102,7 @@ export const numFormat = (num) => {
         });
     });
 }
-const timeout = (time) => new Promise(resolve => {
-    setTimeout(resolve, time)
-})
+
 /**
  * 数组拍平
  * @param arr
@@ -122,8 +124,9 @@ export const flatten1 = (arr) => {
  * @type {{"1": (function(*): *)}}
  */
 export const sort = {
-    1: function (arr) {
-        for (const [val, index] of arr.entries()) {
+    // 冒泡排序
+    bubbleSort: function bubbleSort(arr) {
+        for (const [, index] of arr.entries()) {
             for (let i = 0; i < arr.length - index; i++) {
                 if (arr[i] > arr[i + 1]) {
                     [arr[i], arr[i + 1]] = [arr[i + 1], arr[i]]
@@ -131,9 +134,23 @@ export const sort = {
             }
         }
         return arr;
+    },
+    // 快速排序
+    quickSort: function quickSort(target, left = 0, right = target.length - 1) {
+        if (left >= right) return;
+        let index = left;
+        for (let i = left + 1; i <= right; i++) {
+            if (target[i] <= target[left]) {
+                [target[index + 1], target[i]] = [target[i], target[index + 1]];
+                index++;
+            }
+        }
+        [target[left], target[index]] = [target[index], target[left]];
+        quickSort(target, left, index - 1);
+        quickSort(target, index + 1, right)
+        return target;
     }
 }
-console.log(sort[1]([2, 3, 1, 1, 123, 4234, 12]))
 
 /**
  * 最大并发任务调度
@@ -213,3 +230,104 @@ export const all = (arr) => {
         }
     })
 }
+/**
+ * 中文数字转阿拉伯数字
+ * @param str
+ */
+export const transformZh = (str) => {
+    let res = 0;
+    const zh = ['零', '一', '二', '三', '四', '五', '六', '七', '八', '九'];
+    const unit = ['', '十', '百', '千', '万'];
+    for (let i = 0; i < str.length; i++) {
+        // 针对'十二'这种简写情况特殊处理
+        if (i === 0 && str[i] === "十") {
+            res += 10;
+            continue;
+        }
+        // 万特殊处理
+        if (str[i] === '万') {
+            res *= 10000;
+            continue;
+        }
+        // 判断一到九的数字
+        if (zh.indexOf(str[i]) > 0 && zh.indexOf(str[i]) <= 9) {
+            if (i + 1 < str.length && str[i + 1] !== '万') {
+                // 数字后紧跟单位，且不为万
+                res += zh.indexOf(str[i]) * Math.pow(10, unit.indexOf(str[i + 1]));
+            } else {
+                if (str[i - 1] === '零' || unit.indexOf(str[i - 1]) < 1) {
+                    // 数字前有零或者不存在说明是个位
+                    res += zh.indexOf(str[i]);
+                } else {
+                    //数字前存在单位
+                    res += Math.pow(10, unit.indexOf(str[i - 1]) - 1) * zh.indexOf(str[i]);
+                }
+            }
+        }
+    }
+    console.log(res);
+}
+/**
+ * 阿拉伯数字转中文
+ * @param str
+ */
+export const transformArabic = (str) => {
+
+}
+//
+// // import readline from 'readline';
+// //
+// // let rl = readline.createInterface({
+// //     input: process.stdin,
+// //     output: process.stdout
+// // });
+// //
+// //
+// // rl.on('line', function (line) {
+// //
+// // });
+
+// 一个机器人位于一个 m x n 网格的左上角。
+//
+// 机器人每次只能向下或者向右移动一步。机器人试图达到网格的右下角。
+//
+// 问总共有多少条不同的路径？
+
+function test1(m,n){
+    let i=1,j=1,count=0;
+    function it(){
+        if(i===m&&j===n){
+            count++;
+            return;
+        }
+        if(i<m){
+            i++;
+            it();
+            i--;
+        }
+        if(j<n){
+            j++;
+            it();
+            j--;
+        }
+    }
+    it();
+    console.log(count);
+}
+test1(3,3)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
